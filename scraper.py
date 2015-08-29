@@ -64,8 +64,6 @@ links = block.findAll('a')
 for link in links:
     if 'spend over' in link.text:
         url = 'http://www.wokingham.gov.uk' + link.find_next('a')['href']
-
-
         csvfile = link.text.split()
         csvYr = csvfile[-2]
         if 'August)' in csvYr:
@@ -79,7 +77,7 @@ for link in links:
         if len(csvfile) == 7 and '2015' in csvfile[-2]:
             csvMth = '05'
         csvMth = convert_mth_strings(csvMth.upper())
-        filename = entity_id + "_" + csvYr + "_" + csvMth
+        filename = 'Y'+entity_id + "_" + csvYr + "_" + csvMth
         todays_date = str(datetime.now())
         file_url = url.strip()
         validFilename = validateFilename(filename)
