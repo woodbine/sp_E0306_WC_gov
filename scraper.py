@@ -86,9 +86,10 @@ def convert_mth_strings ( mth_string ):
 #### VARIABLES 1.0
 
 entity_id = "E0306_WC_gov"
-url = "http://www.wokingham.gov.uk/council-and-meetings/open-data/datasets-and-open-data/?categoryesctl7900027=7776"
+url = "http://www.wokingham.gov.uk/council-and-meetings/open-data/datasets-and-open-data/?categoryesctl7900027=7776&categoryesctl91f252ff-550d-4cfa-a838-92ef2cb5f83c=7776&p=1"
 errors = 0
 data = []
+start_url = "http://www.wokingham.gov.uk/council-and-meetings/open-data/datasets-and-open-data/?categoryesctl7900027=7776&categoryesctl91f252ff-550d-4cfa-a838-92ef2cb5f83c=7776&p={}"
 
 
 #### READ HTML 1.0
@@ -98,25 +99,27 @@ soup = BeautifulSoup(html, "lxml")
 
 
 #### SCRAPE DATA
-
-block = soup.find('table', attrs = {'class':'DataGrid oDataGrid'})
-links = block.findAll('a')
-for link in links:
-    if 'spend over' in link.text:
-        url = 'http://www.wokingham.gov.uk' + link.find_next('a')['href']
-        csvfile = link.text.split()
-        csvYr = csvfile[-2]
-        if 'August)' in csvYr:
-            csvYr = '2014'
-            csvMth = 'Q0'
-        if '(Sept-Dec)' in csvYr:
-            csvYr = '2014'
-            csvMth = 'Q0'
-        if len(csvfile)  == 7 and '2015' not in csvfile[-2]:
-            csvMth = 'Y1'
-        if len(csvfile) == 7 and '2015' in csvfile[-2]:
-            csvMth = 'Y1'
-        data.append([csvYr, csvMth, url])
+for i in range(1, 3):
+    html = urllib2.urlopen(start_url.format(i))
+    soup = BeautifulSoup(html, "lxml")
+    block = soup.find('table', attrs = {'summary':'Matching Assets'})
+    links = block.findAll('a')
+    for link in links:
+        if 'spend over' in link.text:
+            url = 'http://www.wokingham.gov.uk' + link.find_next('a')['href']
+            csvfile = link.text.split()
+            csvYr = csvfile[-2]
+            if 'August)' in csvYr:
+                csvYr = '2014'
+                csvMth = 'Q0'
+            if '(Sept-Dec)' in csvYr:
+                csvYr = '2014'
+                csvMth = 'Q0'
+            if len(csvfile)  == 7 and '2015' not in csvfile[-2]:
+                csvMth = 'Y1'
+            if len(csvfile) == 7 and '2015' in csvfile[-2]:
+                csvMth = 'Y1'
+            data.append([csvYr, csvMth, url])
 
 
 #### STORE DATA 1.0
